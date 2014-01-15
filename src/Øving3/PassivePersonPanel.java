@@ -3,6 +3,7 @@ package Øving3;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
+import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 
 import javax.swing.JFrame;
@@ -10,22 +11,29 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import Øving3.Person.Gender;
+
 public class PassivePersonPanel extends PersonPanel {
 	
-	private JTextField gender;
-	private JTextField height;
+	private static JTextField gender;
+	private static JTextField heightField;
+	private static Person model = PersonPanel.getModel();
 	 
 	public PassivePersonPanel(){
 		super();
-		this.gender = new JTextField();
-        this.height = new JTextField();
+		gender = PersonPanel.getGender();
+        heightField = PersonPanel.getHeightField();
         
+        gender.setText("male");
         
         NamePropertyComponent.setEditable(false);
+        NamePropertyComponent.setFocusable(false);
         DateOfBirthPropertyComponent.setEditable(false);
+        DateOfBirthPropertyComponent.setFocusable(false);
         EmailPropertyComponent.setEditable(false);
+        EmailPropertyComponent.setFocusable(false);
         gender.setEditable(false);
-        height.setEditable(false);
+        heightField.setEditable(false);
         
         this.remove(genderPanel);
         this.remove(heightPanel);
@@ -44,35 +52,18 @@ public class PassivePersonPanel extends PersonPanel {
         
         JPanel heightComp = new JPanel();
         heightComp.add(heightLabel);
-        heightComp.add(height);
-        height.setPreferredSize(new Dimension(270,20));
+        heightComp.add(heightField);
+        heightField.setPreferredSize(new Dimension(270,20));
         
         
         add(genderComp);
         add(heightComp);
         
+        
+        
 	}
 	
-	public void propertyChange(PropertyChangeEvent evt) {
-	       String PropertyName = evt.getPropertyName();
-	       switch(PropertyName){
-	       		case Person.NAME_PROPERTY:
-	       			NamePropertyComponent.setText(model.getName());
-	       			break;
-	       		case Person.DATEOFBIRTH_PROPERTY:
-	       			DateOfBirthPropertyComponent.setText(model.getDateOfBirth());
-	       			break;
-	       		case Person.GENDER_PROPERTY:
-	       			gender.setText(model.getGender().toString());
-	       			break;
-	       		case Person.EMAIL_PROPERTY:
-	       			EmailPropertyComponent.setText(model.getEmail());
-	       			break;
-	       		case Person.HEIGHT_PROPERTY:
-	       			height.setText(Integer.toString(model.getHeight()));
-	       			break;
-	       		}
-	       
-		   
-	       }
+	
+	
+
 }

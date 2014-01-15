@@ -11,7 +11,7 @@ public class Person {
 	public final static String EMAIL_PROPERTY = "email";
 	public final static String HEIGHT_PROPERTY = "height";
 	
-	private PropertyChangeSupport pcs;
+	private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 	private String name;
 	private String dateOfBirth;
 	private Gender gender;
@@ -22,8 +22,11 @@ public class Person {
 	
 	
 	public Person(String name){
-		pcs = new PropertyChangeSupport(this);
 		this.name = name;
+		this.dateOfBirth = "";
+		this.gender = gender.male;
+		this.email = "";
+		this.height = 120;
 	}
 	
 	public String getName() {
@@ -33,7 +36,7 @@ public class Person {
 	public void setName(String name) {
 		String oldname = this.name;
 		this.name = name;
-		pcs.firePropertyChange(NAME_PROPERTY, oldname, name);
+		this.pcs.firePropertyChange(NAME_PROPERTY, oldname, name);
 		
 	}
 	

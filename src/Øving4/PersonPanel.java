@@ -24,9 +24,11 @@ import Øving4.Person.Gender;
 
 public class PersonPanel extends JPanel implements PropertyChangeListener {
 
-   protected Person model;
+   protected static Person model;
    protected JPanel genderPanel;
    protected JPanel heightPanel;
+   private static JTextField gender;
+   private static JTextField heightField;
    
    protected JTextField NamePropertyComponent = new JTextField();
    protected JTextField DateOfBirthPropertyComponent = new JTextField();
@@ -36,9 +38,10 @@ public class PersonPanel extends JPanel implements PropertyChangeListener {
    
    //Initialisering av alle fieldvariablene.
    
-   public Person getModel() {
+   public static Person getModel() {
       return model;
    }
+   
    
 
    public void setModel(Person person) {
@@ -49,35 +52,48 @@ public class PersonPanel extends JPanel implements PropertyChangeListener {
       GenderPropertyComponent.setSelectedItem(person.getGender());
       HeightPropertyComponent.setValue(person.getHeight());
       
-      model.addPropertyChangeListener(this);
    }
    
    public void propertyChange(PropertyChangeEvent evt) {
+	   System.out.println("Før: " + NamePropertyComponent.getText());
        String PropertyName = evt.getPropertyName();
        switch(PropertyName){
        		case Person.NAME_PROPERTY:
        			NamePropertyComponent.setText(model.getName());
+       			System.out.println("Etter: " + NamePropertyComponent.getText());
        			break;
        		case Person.DATEOFBIRTH_PROPERTY:
        			DateOfBirthPropertyComponent.setText(model.getDateOfBirth());
        			break;
        		case Person.GENDER_PROPERTY:
        			GenderPropertyComponent.setSelectedItem(model.getGender());
+       			gender.setText(model.getGender().toString());
        			break;
        		case Person.EMAIL_PROPERTY:
        			EmailPropertyComponent.setText(model.getEmail());
        			break;
        		case Person.HEIGHT_PROPERTY:
        			HeightPropertyComponent.setValue(model.getHeight());
+       			heightField.setText(Integer.toString(model.getHeight()));
        			break;
-       		}
-       
-	   
+       		}   
        }
    
-   //Behandling av propertychange.	
+   public static JTextField getGender(){
+	   return gender;
+   }
+   
+   public static JTextField getHeightField(){
+	   return heightField;
+   }
+   
    
    public PersonPanel() {
+	  
+	  heightField = new JTextField();
+	  gender = new JTextField();
+	  model = new Person("");
+	  model.addPropertyChangeListener(this);
 	   
 	  NamePropertyComponent.setName("NamePropertyComponent");
 	  DateOfBirthPropertyComponent.setName("DateOfBirthPropertyComponent");
@@ -149,20 +165,24 @@ public class PersonPanel extends JPanel implements PropertyChangeListener {
       
       add(heightPanel);
   
-      NamePropertyComponent.addKeyListener(new NameListener());
-      DateOfBirthPropertyComponent.addKeyListener(new DateOfBirthListener());
-      EmailPropertyComponent.addKeyListener(new EmailListener());
+      NamePropertyComponent.addKeyListener(new FieldListeners());
+      DateOfBirthPropertyComponent.addKeyListener(new FieldListeners());
+      EmailPropertyComponent.addKeyListener(new FieldListeners());
       GenderPropertyComponent.addActionListener(new GenderListener());
       HeightPropertyComponent.addChangeListener(new HightListener());
+      
+      //Adding av listeners til de forskjellige komponentene.
+   
    }
    
-   class NameListener implements KeyListener {
+
+   
+   class FieldListeners implements KeyListener {
 
 	@Override
 	public void keyPressed(KeyEvent e) {
 		// TODO Auto-generated method stub
-		model.setName(NamePropertyComponent.getText());
-		System.out.println(model.getName());
+		
 	}
 
 	@Override
@@ -170,60 +190,35 @@ public class PersonPanel extends JPanel implements PropertyChangeListener {
 		// TODO Auto-generated method stub
 		
 	}
+	
 
 	@Override
 	public void keyTyped(KeyEvent e) {
 		// TODO Auto-generated method stub
-		
+		if(NamePropertyComponent.isFocusOwner()){
+			model.setName(Textfield(NamePropertyComponent, e));	
+		}else if(DateOfBirthPropertyComponent.isFocusOwner()){
+			model.setDateOfBirth(Textfield(DateOfBirthPropertyComponent, e));
+		}else if(EmailPropertyComponent.isFocusOwner()){
+			model.setEmail(Textfield(EmailPropertyComponent,e));
+		}
 	}
 	   
    }
    
-   class DateOfBirthListener implements KeyListener {
-
-	@Override
-	public void keyPressed(KeyEvent e) {
-		// TODO Auto-generated method stub
-		model.setDateOfBirth(DateOfBirthPropertyComponent.getText());
-        System.out.println(model.getDateOfBirth());
-	}
-
-	@Override
-	public void keyReleased(KeyEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void keyTyped(KeyEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
+   public String Textfield(JTextField field, KeyEvent e){
 	   
+	   char c = e.getKeyChar(); 
+	   int caret = field.getCaretPosition(); //Får tak i posisjonen til hvor bokstaven skal bli skrevet.
+	   String st = field.getText().substring(0, caret) + c + field.getText().substring(caret, field.getText().length()); //Setter bokstaven inn manuelt mellom
+	   														//de to substringene som allerede var der.
+	   return st;
    }
+   //Fikser problemet med at KeyListener kjører før JTextField klarer å legge til bokstaven i tekstfeltet.
    
-   class EmailListener implements KeyListener {
-
-	@Override
-	public void keyPressed(KeyEvent arg0) {
-		// TODO Auto-generated method stub
-		model.setEmail(EmailPropertyComponent.getText());
-        System.out.println(model.getEmail());
-	}
-
-	@Override
-	public void keyReleased(KeyEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void keyTyped(KeyEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-	   
-   }
+   
+   
+  
    
    class GenderListener implements ActionListener {
 
@@ -231,7 +226,6 @@ public class PersonPanel extends JPanel implements PropertyChangeListener {
 	public void actionPerformed(ActionEvent arg0) {
 		// TODO Auto-generated method stub
 		model.setGender((Gender)GenderPropertyComponent.getSelectedItem());   
-        System.out.println(model.getGender());
 	}
 	   
    }
@@ -242,14 +236,12 @@ public class PersonPanel extends JPanel implements PropertyChangeListener {
 	public void stateChanged(ChangeEvent arg0) {
 		// TODO Auto-generated method stub
 		model.setHeight(HeightPropertyComponent.getValue());   
-        System.out.println(model.getHeight());
 	}
 
 	
 	//Forskjellige listeners for å holde variablene til personinstansene oppdaterte.
 	   
    }
-   
    
    
 }
